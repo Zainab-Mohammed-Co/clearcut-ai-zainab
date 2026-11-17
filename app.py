@@ -9,9 +9,12 @@ app = Flask(__name__, static_folder='static')
 app.config['MAX_CONTENT_LENGTH'] = 12 * 1024 * 1024
 Image.MAX_IMAGE_PIXELS = 30_000_000
 
+# Smaller inputs reduce the peak RAM needed by the segmentation model.
+MAX_AI_SIDE = 1024
+
 @lru_cache(maxsize=1)
 def session():
-    return new_session('u2net')
+    return new_session('u2netp')
 
 @app.get('/')
 def home():
@@ -29,15 +32,17 @@ def remove_background():
     if upload.mimetype not in ('image/png', 'image/jpeg', 'image/webp'):
         return jsonify(error='Only JPG, PNG and WebP are supported.'), 400
     try:
-        image = Image.open(upload.stream)
-        image.verify()
+        with Image.open(upload.stream) as check:
+            check.verify()
         upload.stream.seek(0)
-        image = ImageOps.exif_transpose(Image.open(upload.stream)).convert('RGB')
-        if image.width * image.height > 25_000_000:
-            return jsonify(error='Image resolution is too large (max 25 megapixels).'), 400
+        with Image.open(upload.stream) as source:
+            if source.width * source.height > 25_000_000:
+                return jsonify(error='Image resolution is too large (max 25 megapixels).'), 400
+            image = ImageOps.exif_transpose(source).convert('RGB')
+        image.thumbnail((MAX_AI_SIDE, MAX_AI_SIDE), Image.Resampling.LANCZOS)
         result = remove(image, session=session()).convert('RGBA')
         out = io.BytesIO()
-        result.save(out, format='PNG')
+        result.save(out, format='PNG', optimize=False)
         out.seek(0)
         return send_file(out, mimetype='image/png', download_name='clearcut.png', as_attachment=False)
     except (UnidentifiedImageError, OSError, ValueError):
