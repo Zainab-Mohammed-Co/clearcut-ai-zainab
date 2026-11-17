@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - model_cache:/root/.u2net
+      - rembg_cache:/root/.rembg
+    restart: unless-stopped
+volumes:
+  model_cache:
+  rembg_cache:

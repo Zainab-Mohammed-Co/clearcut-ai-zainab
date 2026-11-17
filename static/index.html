@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="#101323" name="theme-color"/><title>ClearCut AI — Background Remover</title><style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:#eef0ff;background:#0d1020}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#333266 0,transparent 55%),#0d1020;min-height:100vh}header{height:76px;display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:auto;padding:0 24px}.brand{font-weight:850;font-size:23px;letter-spacing:-.8px}.brand span{color:#9c91ff}.pill{border:1px solid #44435e;background:#222239;padding:8px 13px;border-radius:30px;color:#c7c5e8;font-size:12px}main{max-width:1020px;margin:35px auto;padding:0 22px}.intro{text-align:center;margin-bottom:30px}.eyebrow{color:#aaa1ff;font-size:12px;letter-spacing:2px;font-weight:800;text-transform:uppercase}h1{font-size:clamp(35px,6vw,62px);line-height:1.08;letter-spacing:-2.5px;margin:15px auto;max-width:760px}h1 em{font-style:normal;color:#a79cff}.sub{color:#a6a9c2;font-size:16px;line-height:1.6}.panel{background:#181b2f;border:1px solid #36394f;border-radius:24px;padding:25px;box-shadow:0 24px 65px #0003}.drop{border:2px dashed #565276;border-radius:18px;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;text-align:center;background:#1d2038;cursor:pointer;transition:.2s;padding:25px}.drop:hover,.drop.drag{border-color:#b0a6ff;background:#252540}.drop-icon{display:grid;place-items:center;width:62px;height:62px;border-radius:17px;background:#39345e;color:#bdb4ff;font-size:30px}.drop strong{font-size:19px}.muted{color:#a3a7c1;font-size:13px}.btn{border:0;background:#9588ff;color:#0f0d20;padding:13px 24px;border-radius:12px;font-weight:800;cursor:pointer;font-size:14px}.btn:hover{background:#b5aaff}.btn:disabled{opacity:.55;cursor:wait}.btn.secondary{background:#343752;color:#eee}.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:19px}.workspace{display:none}.workspace.visible{display:block}.compare{display:grid;grid-template-columns:1fr 1fr;gap:15px}.preview-card{min-width:0}.preview-label{font-size:13px;color:#c3c4dc;font-weight:750;margin-bottom:10px}.preview{height:310px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:#282b40}.checker{background-color:#fff;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.preview img{max-width:100%;max-height:100%;object-fit:contain}.options{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px}.swatches{display:flex;align-items:center;gap:8px}.swatch{width:30px;height:30px;border-radius:50%;border:2px solid #73768c;cursor:pointer}.swatch.active{outline:2px solid #a99fff;outline-offset:3px}.swatch.transparent{background:repeating-conic-gradient(#ddd 0% 25%,white 0% 50%) 50%/12px 12px}.swatch.white{background:white}.swatch.black{background:#101010}.swatch.blue{background:#9ed2ff}.swatch.pink{background:#ffd2e3}#custom{width:32px;height:32px;padding:0;border:0;background:none;cursor:pointer}.status{text-align:center;color:#b4aaff;font-size:13px;min-height:22px;margin-top:15px}.footer{text-align:center;color:#777d9d;font-size:12px;padding:35px 20px}input[type=file]{display:none}@media(max-width:640px){main{margin:15px auto}.panel{padding:15px}.compare{grid-template-columns:1fr}.preview{height:250px}.pill{font-size:10px}h1{letter-spacing:-1.5px}}
+.student-banner{max-width:1020px;margin:18px auto 0;padding:22px 24px;text-align:center;border:1px solid #49436c;border-radius:18px;background:linear-gradient(120deg,#22203f,#191b30)}.student-banner .student-label{color:#b6adff;font-size:11px;font-weight:800;letter-spacing:2.5px}.student-banner h2{font-size:clamp(26px,4vw,38px);margin:9px 0 5px;color:#eeeaff}.student-banner p{margin:0;color:#b8b9d5;font-size:15px}@media(max-width:640px){.student-banner{margin:12px 18px 0;padding:20px 12px}}.editor{margin-top:20px;padding:18px;border:1px solid #42445f;border-radius:16px;background:#20243b}.editor h3{margin:0 0 12px;font-size:17px}.edit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.edit-field{display:flex;flex-direction:column;gap:6px;color:#c3c4dc;font-size:13px}.edit-field input{width:100%;padding:10px;border:1px solid #555976;border-radius:9px;background:#111528;color:#fff}.editor-note{font-size:12px;color:#a3a7c1;margin:12px 0 0}.editor-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.editor-actions .btn{padding:10px 15px}.editor[hidden]{display:none!important}
+.crop-slider{display:block;width:100%;margin:10px 0 4px;accent-color:#a79cff;cursor:pointer;touch-action:pan-y}
+.edit-field input[type=range]{width:100%;min-height:24px}
+
+/* Direct manipulation crop tool */
+.crop-image-wrap{position:relative;display:inline-block;max-width:100%;max-height:100%;line-height:0;flex:none}
+.crop-image-wrap>img{display:block;max-width:100%;max-height:310px;width:auto;height:auto;object-fit:contain}
+.crop-overlay{position:absolute;inset:0;touch-action:none;user-select:none;display:none;line-height:normal}
+.crop-overlay.ready{display:block}
+.crop-box{position:absolute;border:2px solid #a99fff;box-shadow:0 0 0 9999px #090b18a6;cursor:move;touch-action:none}
+.crop-box:before,.crop-box:after{content:"";position:absolute;pointer-events:none}
+.crop-box:before{inset:0;border-left:1px solid #fff6;border-right:1px solid #fff6;left:33.333%;right:33.333%}
+.crop-box:after{inset:33.333% 0;border-top:1px solid #fff6;border-bottom:1px solid #fff6}
+.crop-handle{position:absolute;width:14px;height:14px;background:#fff;border:2px solid #7567ff;border-radius:4px;z-index:2;touch-action:none}
+.handle-nw{left:0;top:0;transform:translate(-50%,-50%);cursor:nwse-resize}.handle-n{left:50%;top:0;transform:translate(-50%,-50%);cursor:ns-resize}.handle-ne{right:0;top:0;transform:translate(50%,-50%);cursor:nesw-resize}.handle-e{right:0;top:50%;transform:translate(50%,-50%);cursor:ew-resize}.handle-se{right:0;bottom:0;transform:translate(50%,50%);cursor:nwse-resize}.handle-s{left:50%;bottom:0;transform:translate(-50%,50%);cursor:ns-resize}.handle-sw{left:0;bottom:0;transform:translate(-50%,50%);cursor:nesw-resize}.handle-w{left:0;top:50%;transform:translate(-50%,-50%);cursor:ew-resize}
+@media(max-width:640px){.crop-image-wrap>img{max-height:250px}.crop-handle{width:18px;height:18px}}
+
+.live-preview-section{margin-top:22px}.live-preview-section .preview{height:290px}.live-preview-section canvas{max-width:100%;max-height:100%;object-fit:contain}.live-preview-section .preview-label{margin-bottom:10px}
+</style></head><body><header><div class="brand">✦ ClearCut <span>AI</span></div><div class="pill">✦ Free • Open-source AI</div></header><section aria-label="Educational project attribution" class="student-banner"><div class="student-label">EDUCATIONAL PROJECT</div><h2>Zainab Mohammed</h2><p>AI-Powered Background Removal</p></section><main><div class="intro"><div class="eyebrow">Instant background remover</div><h1>Remove backgrounds.<br/><em>Keep the magic.</em></h1><div class="sub">Upload your photo and create a clean, transparent image in seconds.<br/>No account. No paid API. Just your image.</div></div><section class="panel"><div aria-label="Upload an image" class="drop" id="uploadArea" role="button" tabindex="0"><div class="drop-icon">↥</div><strong>Drop your image here</strong><span class="muted">or click to browse your files</span><button class="btn" id="browse" type="button">Choose Image</button><span class="muted">JPG, PNG or WebP • Max 12 MB</span></div><input accept="image/png,image/jpeg,image/webp" id="file" type="file"/><div class="workspace" id="workspace"><div class="compare"><div class="preview-card"><div class="preview-label">Original</div><div class="preview"><img alt="Original image" id="original"/></div></div><div class="preview-card"><div class="preview-label">Background removed</div><div class="preview checker" id="resultBg"><div class="crop-image-wrap" id="cropImageWrap"><img alt="Image with background removed" id="result"/><div aria-label="Drag the crop rectangle or its handles to adjust crop" class="crop-overlay" id="cropOverlay"><div class="crop-box" id="cropBox"><span class="crop-handle handle-nw" data-handle="nw"></span><span class="crop-handle handle-n" data-handle="n"></span><span class="crop-handle handle-ne" data-handle="ne"></span><span class="crop-handle handle-e" data-handle="e"></span><span class="crop-handle handle-se" data-handle="se"></span><span class="crop-handle handle-s" data-handle="s"></span><span class="crop-handle handle-sw" data-handle="sw"></span><span class="crop-handle handle-w" data-handle="w"></span></div></div></div></div></div></div><div class="options"><div><div class="preview-label">Background color</div><div class="swatches"><button aria-label="Transparent background" class="swatch transparent active" data-bg="transparent" title="Transparent"></button><button aria-label="White background" class="swatch white" data-bg="#ffffff" title="White"></button><button aria-label="Black background" class="swatch black" data-bg="#101010" title="Black"></button><button aria-label="Blue background" class="swatch blue" data-bg="#9ed2ff" title="Blue"></button><button aria-label="Pink background" class="swatch pink" data-bg="#ffd2e3" title="Pink"></button><input aria-label="Custom background color" id="custom" type="color" value="#a78bfa"/></div></div><div class="controls"><button class="btn secondary" id="again">New Image</button><button class="btn" disabled="" id="download">↓ Download PNG</button></div></div></div><div class="editor" hidden="" id="editor"><h3>✂ Image Editor</h3><div class="edit-grid"><label class="edit-field">Crop left (%)<input id="cropLeft" max="95" min="0" type="number" value="0"/><input aria-label="Slide crop left" class="crop-slider" id="cropLeftSlider" max="95" min="0" step="1" type="range" value="0"/></label><label class="edit-field">Crop top (%)<input id="cropTop" max="95" min="0" type="number" value="0"/><input aria-label="Slide crop top" class="crop-slider" id="cropTopSlider" max="95" min="0" step="1" type="range" value="0"/></label><label class="edit-field">Crop right (%)<input id="cropRight" max="95" min="0" type="number" value="0"/><input aria-label="Slide crop right" class="crop-slider" id="cropRightSlider" max="95" min="0" step="1" type="range" value="0"/></label><label class="edit-field">Crop bottom (%)<input id="cropBottom" max="95" min="0" type="number" value="0"/><input aria-label="Slide crop bottom" class="crop-slider" id="cropBottomSlider" max="95" min="0" step="1" type="range" value="0"/></label><label class="edit-field">Output width (px)<input id="outWidth" max="8000" min="1" placeholder="Original" type="number"/></label><label class="edit-field">Output height (px)<input id="outHeight" max="8000" min="1" placeholder="Original" type="number"/></label></div><p class="editor-note">Drag the crop frame directly on the image, resize using its eight handles, or use the sliders and numeric inputs below. Click Update preview to apply edits.</p><div class="editor-actions"><button class="btn secondary" id="resetEdit" type="button">Reset edits</button><button class="btn secondary" id="applyEdit" type="button">Update preview</button></div><div class="live-preview-section"><div class="preview-label">Live edited preview <span style="font-weight:400;color:#aaa">(updates as you slide or drag)</span></div><div class="preview checker" id="livePreviewBg"><canvas aria-label="Live crop and resize preview" id="liveCanvas"></canvas></div></div></div><div aria-live="polite" class="status" id="status" role="status"></div></section></main><div class="footer">Powered by open-source Rembg AI • Images are processed on this server and are not stored</div><script>
+const $=id=>document.getElementById(id);let originalUrl=null,resultUrl=null,background='transparent',busy=false,filename='image';const upload=$('uploadArea'),file=$('file'),status=$('status');function message(s){status.textContent=s}function choose(){file.click()}upload.addEventListener('click',e=>{if(e.target.id!=='browse')choose()});$('browse').onclick=e=>{e.stopPropagation();choose()};upload.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}});['dragenter','dragover'].forEach(x=>upload.addEventListener(x,e=>{e.preventDefault();upload.classList.add('drag')}));['dragleave','drop'].forEach(x=>upload.addEventListener(x,e=>{e.preventDefault();upload.classList.remove('drag')}));upload.addEventListener('drop',e=>{if(e.dataTransfer.files[0])process(e.dataTransfer.files[0])});file.addEventListener('change',()=>{if(file.files[0])process(file.files[0])});async function process(f){if(busy)return;if(!['image/jpeg','image/png','image/webp'].includes(f.type)){message('Please choose a JPG, PNG or WebP image.');return}if(f.size>12*1024*1024){message('Maximum file size is 12 MB.');return}busy=true;filename=(f.name.replace(/\.[^.]+$/,'')||'image');if(originalUrl)URL.revokeObjectURL(originalUrl);if(resultUrl)URL.revokeObjectURL(resultUrl);resultUrl=null;originalUrl=URL.createObjectURL(f);$('original').src=originalUrl;$('result').removeAttribute('src');$('download').disabled=true;upload.style.display='none';$('workspace').classList.add('visible');message('Removing background… First image may take longer while the AI model downloads.');try{let data=new FormData();data.append('image',f);let response=await fetch('/api/remove',{method:'POST',body:data});if(!response.ok){let error=await response.json().catch(()=>({}));throw Error(error.error||'Unable to process image')}resultUrl=URL.createObjectURL(await response.blob());$('result').src=resultUrl;$('download').disabled=false;$('editor').hidden=false;resetEditor();message('✓ Background removed! Choose a color or download your PNG.')}catch(e){message('Error: '+e.message)}finally{busy=false}}$('again').onclick=()=>{if(busy)return;upload.style.display='flex';$('workspace').classList.remove('visible');$('editor').hidden=true;file.value='';message('')};function setBackground(bg){background=bg;const el=$('resultBg');el.classList.toggle('checker',bg==='transparent');el.style.backgroundColor=bg==='transparent'?'':bg;document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.bg===bg))}document.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>setBackground(s.dataset.bg));$('custom').oninput=e=>setBackground(e.target.value);for(const side of ['Left','Top','Right','Bottom']){
+ const number=$('crop'+side), slider=$('crop'+side+'Slider');
+ slider.addEventListener('input',()=>{number.value=slider.value;});
+ number.addEventListener('input',()=>{const v=Number(number.value);if(Number.isFinite(v))slider.value=Math.max(0,Math.min(95,v));});
+}
+function resetEditor(){for(const id of ['cropLeft','cropTop','cropRight','cropBottom']){$(id).value=0;$(id+'Slider').value=0;}$('outWidth').value='';$('outHeight').value='';if(resultUrl)$('result').src=resultUrl}
+$('resetEdit').onclick=resetEditor;
+async function renderEdited(){if(!resultUrl)throw Error('No processed image available');const img=new Image();img.src=resultUrl;await img.decode();const w=img.naturalWidth,h=img.naturalHeight;const vals=['cropLeft','cropTop','cropRight','cropBottom'].map(id=>Number($(id).value));if(vals.some(v=>!Number.isFinite(v)||v<0||v>95)||vals[0]+vals[2]>=100||vals[1]+vals[3]>=100)throw Error('Invalid crop: opposite sides must total less than 100%.');const x=Math.round(w*vals[0]/100),y=Math.round(h*vals[1]/100);const sw=w-x-Math.round(w*vals[2]/100),sh=h-y-Math.round(h*vals[3]/100);if(sw<1||sh<1)throw Error('Crop area is too small.');const ow=$('outWidth').value.trim(),oh=$('outHeight').value.trim();let width=ow?Number(ow):0,height=oh?Number(oh):0;if((ow&&(!Number.isInteger(width)||width<1||width>8000))||(oh&&(!Number.isInteger(height)||height<1||height>8000)))throw Error('Output dimensions must be 1–8000 pixels.');if(!width&&!height){width=sw;height=sh}else if(!width)width=Math.max(1,Math.round(height*sw/sh));else if(!height)height=Math.max(1,Math.round(width*sh/sw));if(width*height>32000000)throw Error('Image too large. Keep output below 32 megapixels.');const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const ctx=canvas.getContext('2d');if(background!=='transparent'){ctx.fillStyle=background;ctx.fillRect(0,0,width,height)}ctx.imageSmoothingQuality='high';ctx.drawImage(img,x,y,sw,sh,0,0,width,height);return canvas}
+$('applyEdit').onclick=()=>{scheduleLivePreview();message('✓ Live preview updated. Download to save your edited image.');};
+$('download').onclick=async()=>{try{const canvas=await renderEdited();canvas.toBlob(blob=>{if(!blob){message('Could not export PNG.');return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+'-clearcut-edited.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')}catch(e){message('Error: '+e.message)}};
+
+// On-image crop rectangle, synchronized with the existing percentage inputs and sliders.
+const cropSides=['Left','Top','Right','Bottom'];
+const cropOverlay=$('cropOverlay'),cropBox=$('cropBox');
+const clampCrop=(n,min,max)=>Math.max(min,Math.min(max,n));
+function cropValues(){return cropSides.map(side=>Number($('crop'+side).value)||0)}
+function updateCropBox(){
+ const [l,t,r,b]=cropValues();
+ cropBox.style.left=l+'%';cropBox.style.top=t+'%';
+ cropBox.style.width=Math.max(0,100-l-r)+'%';cropBox.style.height=Math.max(0,100-t-b)+'%';
+}
+function setCropValues(values){
+ const [l,t,r,b]=values;
+ const safe=[clampCrop(l,0,95),clampCrop(t,0,95),clampCrop(r,0,95),clampCrop(b,0,95)];
+ if(safe[0]+safe[2]>99) safe[2]=99-safe[0];
+ if(safe[1]+safe[3]>99) safe[3]=99-safe[1];
+ cropSides.forEach((side,i)=>{const v=Math.round(safe[i]*10)/10;$('crop'+side).value=v;$('crop'+side+'Slider').value=v});
+ updateCropBox();
+}
+function showSourceCrop(){
+ if(!resultUrl)return;
+ if($('result').src!==resultUrl)$('result').src=resultUrl;
+ cropOverlay.classList.add('ready');updateCropBox();
+}
+for(const side of cropSides){
+ for(const suffix of ['', 'Slider']){
+  $('crop'+side+suffix).addEventListener('input',()=>{
+   const v=cropValues(),i=cropSides.indexOf(side);
+   v[i]=Number($('crop'+side+suffix).value)||0;
+   if(i===0)v[2]=Math.min(v[2],99-v[0]);
+   if(i===2)v[0]=Math.min(v[0],99-v[2]);
+   if(i===1)v[3]=Math.min(v[3],99-v[1]);
+   if(i===3)v[1]=Math.min(v[1],99-v[3]);
+   setCropValues(v);showSourceCrop();
+  });
+ }
+}
+let cropDrag=null;
+cropBox.addEventListener('pointerdown',e=>{
+ if(!resultUrl||!cropOverlay.classList.contains('ready'))return;
+ e.preventDefault();
+ const handle=e.target.dataset.handle||'move';
+ cropDrag={handle,startX:e.clientX,startY:e.clientY,values:cropValues()};
+ cropBox.setPointerCapture(e.pointerId);
+});
+cropBox.addEventListener('pointermove',e=>{
+ if(!cropDrag)return;
+ const rect=cropOverlay.getBoundingClientRect();if(!rect.width||!rect.height)return;
+ const dx=(e.clientX-cropDrag.startX)/rect.width*100;
+ const dy=(e.clientY-cropDrag.startY)/rect.height*100;
+ const [l,t,r,b]=cropDrag.values;
+ let L=l,T=t,R=r,B=b;
+ const h=cropDrag.handle;
+ if(h==='move'){
+  L=clampCrop(l+dx,0,100-r-l);R=l+r-L;
+  T=clampCrop(t+dy,0,100-b-t);B=t+b-T;
+ }else{
+  if(h.includes('w'))L=clampCrop(l+dx,0,99-r);
+  if(h.includes('e'))R=clampCrop(r-dx,0,99-l);
+  if(h.includes('n'))T=clampCrop(t+dy,0,99-b);
+  if(h.includes('s'))B=clampCrop(b-dy,0,99-t);
+ }
+ setCropValues([L,T,R,B]);
+});
+for(const eventName of ['pointerup','pointercancel','lostpointercapture'])cropBox.addEventListener(eventName,()=>{cropDrag=null});
+$('result').addEventListener('load',()=>{
+ if(resultUrl && $('result').src===resultUrl){cropOverlay.classList.add('ready');updateCropBox()}
+});
+
+$('resetEdit').addEventListener('click',()=>{showSourceCrop()});
+$('again').addEventListener('click',()=>cropOverlay.classList.remove('ready'));
+
+// Real-time edited preview: source image and draggable crop handles remain untouched.
+let liveFrame=0,liveSerial=0;
+function scheduleLivePreview(){
+ if(!resultUrl)return;
+ if(liveFrame)cancelAnimationFrame(liveFrame);
+ const serial=++liveSerial;
+ liveFrame=requestAnimationFrame(async()=>{
+  liveFrame=0;
+  try{
+   const canvas=await renderEdited();
+   if(serial!==liveSerial)return;
+   const target=$('liveCanvas');
+   target.width=canvas.width;target.height=canvas.height;
+   target.getContext('2d').drawImage(canvas,0,0);
+   $('livePreviewBg').classList.toggle('checker',background==='transparent');
+   $('livePreviewBg').style.backgroundColor=background==='transparent'?'':background;
+  }catch(e){if(serial===liveSerial)message('Preview: '+e.message)}
+ });
+}
+for(const side of cropSides){
+ for(const suffix of ['', 'Slider'])$('crop'+side+suffix).addEventListener('input',scheduleLivePreview);
+}
+for(const id of ['outWidth','outHeight'])$(id).addEventListener('input',scheduleLivePreview);
+cropBox.addEventListener('pointermove',()=>{if(cropDrag)scheduleLivePreview()});
+for(const eventName of ['pointerup','pointercancel'])cropBox.addEventListener(eventName,scheduleLivePreview);
+for(const el of document.querySelectorAll('.swatch'))el.addEventListener('click',scheduleLivePreview);
+$('custom').addEventListener('input',scheduleLivePreview);
+$('resetEdit').addEventListener('click',scheduleLivePreview);
+$('result').addEventListener('load',()=>{if(resultUrl && $('result').src===resultUrl)scheduleLivePreview()});
+</script></body></html>
